@@ -16,5 +16,6 @@ const connectDB = async () => {
 };
 
 const User = require('../model/User');
+const Task = require('../model/Task');
 
 module.exports = connectDB;

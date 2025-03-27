@@ -1,43 +1,68 @@
 const User = require('../model/User');
+const jwt = require('jsonwebtoken');
 
-const registerUser = async (req, res) => {
-    const { email, password, role } = req.body;
-
+class UserController {
+  // Register a new user
+  static async registerUser(req, res) {
     try {
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({ message: 'Email already in use' });
-        }
+      const { email, password, role } = req.body;
+      // Check if the user already exists
+      const userExists = await User.findOne({ email });
+      if (userExists) {
+        return res.status(400).json({ message: 'Email already in use' });
+      }
 
-        const newUser = new User({
-            email,
-            password,
-            role,
-        });
+      // Create new user; the password will be hashed automatically via the pre-save hook
+      const newUser = new User({ email, password, role });
+      await newUser.save();
 
-        await newUser.save();
-        res.status(201).json({ message: 'User registered successfully', newUser });
+      return res.status(201).json({ message: 'User registered successfully', newUser });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+      console.error(error);
+      return res.status(500).json({ message: 'Server error' });
     }
-};
+  }
 
-const loginUser = async (req, res) => {
-    const { email, password } = req.body;
-
+  // Login user and return a JWT token
+  static async loginUser(req, res) {
     try {
-        const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+      const { email, password } = req.body;
+      // Find the user by email
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({ message: 'Invalid credentials' });
+      }
 
-        const isMatch = await user.matchPassword(password);
-        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+      // Compare the provided password with the hashed password in the database using model method
+      const isMatch = await user.matchPassword(password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Invalid credentials' });
+      }
 
-        res.status(200).json({ message: 'Login successful', user });
+      // Create a JWT token with an expiration of 1 hour
+      const token = jwt.sign(
+        { userId: user._id, email: user.email, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+
+      return res.status(200).json({ message: 'Login successful', token,userId: user._id });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+      console.error(error);
+      return res.status(500).json({ message: 'Server error' });
     }
-};
+  }
 
-module.exports = { registerUser, loginUser };
+  // Get all users from the database
+  static async getAllUsers(req, res) {
+    try {
+      const users = await User.find();
+      return res.status(200).json({ message: 'Users retrieved successfully', users });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Server error' });
+    }
+  }
+}
+
+module.exports = UserController;

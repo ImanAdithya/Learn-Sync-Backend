@@ -3,6 +3,8 @@ const connectDB = require('./db/db');
 require('dotenv').config();
 const cors = require('cors');
 const userRoutes = require('./route/UserRoute');
+const taskRoute = require('./route/TaskRoute');
+const examRoute = require('./route/ExamRoute');
 
 
 
@@ -16,6 +18,8 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 
 app.use('/api/users', userRoutes);
+app.use('/api/task', taskRoute);
+app.use('/api/exam', examRoute);
 
 // Simple route to test
 app.get('/', (req, res) => {
