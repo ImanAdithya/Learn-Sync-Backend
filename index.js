@@ -5,7 +5,8 @@ const cors = require('cors');
 const userRoutes = require('./route/UserRoute');
 const taskRoute = require('./route/TaskRoute');
 const examRoute = require('./route/ExamRoute');
-
+const groupChatRoute = require('./route/GroupChatRoute');
+const chatDetailRoute = require('./route/ChatDetailRoute');
 
 
 const app = express();
@@ -20,6 +21,8 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api/task', taskRoute);
 app.use('/api/exam', examRoute);
+app.use('/api/groupChat', groupChatRoute);
+app.use('/api/chatDetail', chatDetailRoute);
 
 // Simple route to test
 app.get('/', (req, res) => {

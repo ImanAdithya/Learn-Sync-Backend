@@ -46,7 +46,7 @@ class UserController {
         { expiresIn: '1h' }
       );
 
-      return res.status(200).json({ message: 'Login successful', token,userId: user._id });
+      return res.status(200).json({ message: 'Login successful', token,userId: user._id,role: user.role });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: 'Server error' });
@@ -57,12 +57,17 @@ class UserController {
   static async getAllUsers(req, res) {
     try {
       const users = await User.find();
-      return res.status(200).json({ message: 'Users retrieved successfully', users });
+
+      const filteredUsers = users.filter(user => user.role !== 'admin');
+  
+      return res.status(200).json({ message: 'Users retrieved successfully', users: filteredUsers });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: 'Server error' });
     }
   }
+
 }
+  
 
 module.exports = UserController;
