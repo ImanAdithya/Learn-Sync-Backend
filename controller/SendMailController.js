@@ -27,5 +27,29 @@ const sendMail = async (req, res) => {
       res.status(500).json({ message: 'Error sending email', error: error.message });
     }
 };
+
+const resetPassword = async (req, res) => {
+  const to = req.query.email;
+    const otp = generateOtp();
+
+    const subject="Your OTP Code for Password Recovery"
+    const text=`use the OTP code below to complete your recover: OTP Code: ${otp}`
+    
+
+    const mailOptions = {
+      from: process.env.GMAIL_USER,
+      to,
+      subject,
+      text,
+    };
   
-  module.exports = { sendMail };
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      res.status(200).json({ message: 'Email sent', otp });
+    } catch (error) {
+      console.error('Error sending email:', error);
+      res.status(500).json({ message: 'Error sending email', error: error.message });
+    }
+};
+  
+  module.exports = { sendMail ,resetPassword };

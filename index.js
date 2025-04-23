@@ -7,7 +7,7 @@ const taskRoute = require('./route/TaskRoute');
 const examRoute = require('./route/ExamRoute');
 const groupChatRoute = require('./route/GroupChatRoute');
 const chatDetailRoute = require('./route/ChatDetailRoute');
-
+const mailRoutes = require('./route/MailRoute');
 
 const app = express();
 app.use(express.json());
@@ -23,6 +23,7 @@ app.use('/api/task', taskRoute);
 app.use('/api/exam', examRoute);
 app.use('/api/groupChat', groupChatRoute);
 app.use('/api/chatDetail', chatDetailRoute);
+app.use('/api/sendMail', mailRoutes);
 
 // Simple route to test
 app.get('/', (req, res) => {
